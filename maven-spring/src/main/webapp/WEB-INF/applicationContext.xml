@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	   xmlns:aop="http://www.springframework.org/schema/aop" 
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc" 
+	   xmlns:tx="http://www.springframework.org/schema/tx" 
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop-3.0.xsd 
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+		http://www.springframework.org/schema/mvc 
+		http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd 
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+<!-- 配置数据源 -->
+     <bean id="dataSourceMySQL" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+	<!-- <bean id="dataSourceMySQL" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"> -->
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3306/excel?characterEncoding=utf8"/>
+		<property name="username" value="root" />
+		<property name="password" value="123456" />
+		<!-- 连接池启动时的初始值 -->
+		<property name="initialSize" value="3" />
+		<!-- 连接池的最大值 -->
+		<property name="maxActive" value="20" />
+		<!-- 最大空闲值.当经过一个高峰时间后，连接池可以慢慢将已经用不到的连接慢慢释放一部分，一直减少到maxIdle为止 -->
+		<property name="maxIdle" value="5" />
+		<!--  最小空闲值.当空闲的连接数少于阀值时，连接池就会预申请去一些连接，以免洪峰来时来不及申请 -->
+		<property name="minIdle" value="3" />
+	</bean>
+	
+	
+	<bean id="sqlsessionfactory"  class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSourceMySQL"></property>
+		<property name="mapperLocations" value="classpath:cn/springmvc/sql/*.xml"></property>
+	</bean>
+	
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="cn.springmvc.dao"></property>
+		<!-- 可以不写
+		 <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+		 -->
+		
+		
+	</bean>
+	
+	  <!-- viewresolver -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/jsp/">
+		</property>
+		<property name="suffix" value=".jsp">
+		</property>
+	</bean>
+
+	<!-- 扫描service,controller -->
+	<context:component-scan base-package="cn.springmvc"/>
+
+	<!-- handlermapping @RequestMapping,@ResponseBody,@ExceptionHanlder -->
+	<mvc:annotation-driven/>
+	
+    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>
+    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter"/>  
+</beans>
